@@ -19,3 +19,5 @@ python main.py
 ```
 После проверки вам придёт уведомление от бота:
 
+<img width="491" height="209" alt="Telegram_2025-12-17_02-14-11" src="https://github.com/user-attachments/assets/390b95ab-b727-41c9-a0d1-cb02702d8b4f" />
+
