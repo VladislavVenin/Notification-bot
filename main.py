@@ -3,6 +3,7 @@ from requests.exceptions import ReadTimeout, ConnectionError
 import decouple
 import telegram
 from pprint import pprint
+import time
 
 
 def main():
@@ -30,8 +31,12 @@ def main():
                 message += "\n\nПреподавателю всё понравилось, можно приступать к следующему уроку!"
             bot.send_message(decouple.config('CHAT_ID'), message)
             payload["timestamp"] = response_payload["new_attempts"][0]["timestamp"]
-        except (ReadTimeout, ConnectionError) as e:
+        except ReadTimeout:
+            continue
+        except ConnectionError as e:
             print(e)
+            half_an_hour = 3600
+            time.sleep(half_an_hour)
             continue
 
 
