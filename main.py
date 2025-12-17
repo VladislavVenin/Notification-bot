@@ -21,6 +21,7 @@ def main():
     while True:
         try:
             response = requests.get(url, headers=headers, timeout=60, params=payload)
+            response.raise_for_status()
             response_payload = response.json()
             pprint(response_payload)
             lesson_title = response_payload["new_attempts"][0]["lesson_title"]
