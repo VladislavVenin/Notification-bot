@@ -11,7 +11,8 @@ from requests.exceptions import ReadTimeout, ConnectionError
 def main():
     logging.basicConfig(
         level=logging.INFO,
-        format="(%(process)d) %(asctime)s %(levelname)s %(message)s"
+        format="%(asctime)s (%(process)d) %(levelname)s: %(message)s",
+        datefmt='%d/%m/%Y %I:%M:%S'
     )
     bot_api_key = decouple.config('TG_BOT')
     bot = telegram.Bot(token=bot_api_key)
