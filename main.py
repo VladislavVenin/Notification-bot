@@ -64,9 +64,12 @@ def main():
             continue
         except ConnectionError as e:
             logging.error(e)
-            half_an_hour = 3600
+            half_an_hour = 1800
             time.sleep(half_an_hour)
             continue
+        except Exception as e:
+            logging.error(f"Unexpected error: {e}")
+            time.sleep(60)
 
 
 if __name__ == '__main__':
