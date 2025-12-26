@@ -1,9 +1,11 @@
-import requests
-from requests.exceptions import ReadTimeout, ConnectionError
+from pprint import pprint
+from datetime import datetime
+import time
+
 import decouple
 import telegram
-from pprint import pprint
-import time
+import requests
+from requests.exceptions import ReadTimeout, ConnectionError
 
 
 def main():
@@ -18,11 +20,13 @@ def main():
     payload = {
         "timestamp": None
     }
+    print("Бот запущен...")
     while True:
         try:
-            response = requests.get(url, headers=headers, timeout=60, params=payload)
+            response = requests.get(url, headers=headers, timeout=90, params=payload)
             response.raise_for_status()
             response_payload = response.json()
+            print(datetime.now())
             pprint(response_payload)
             lesson_title = response_payload["new_attempts"][0]["lesson_title"]
             message = f'У вас проверили работу "{lesson_title}"'
@@ -32,7 +36,7 @@ def main():
                 message += "\n\nПреподавателю всё понравилось, можно приступать к следующему уроку!"
             bot.send_message(decouple.config('CHAT_ID'), message)
             payload["timestamp"] = response_payload["new_attempts"][0]["timestamp"]
-        except ReadTimeout:
+        except (ReadTimeout, KeyError):
             continue
         except ConnectionError as e:
             print(e)
