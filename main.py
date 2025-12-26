@@ -1,5 +1,5 @@
 from pprint import pprint
-from datetime import datetime
+import logging
 import time
 
 import decouple
@@ -9,6 +9,10 @@ from requests.exceptions import ReadTimeout, ConnectionError
 
 
 def main():
+    logging.basicConfig(
+        level=logging.INFO,
+        format="(%(process)d) %(asctime)s %(levelname)s %(message)s"
+    )
     bot_api_key = decouple.config('TG_BOT')
     bot = telegram.Bot(token=bot_api_key)
 
@@ -20,13 +24,12 @@ def main():
     payload = {
         "timestamp": None
     }
-    print("Бот запущен...")
+    logging.info("Бот запущен...")
     while True:
         try:
             response = requests.get(url, headers=headers, timeout=90, params=payload)
             response.raise_for_status()
             response_payload = response.json()
-            print(datetime.now())
             pprint(response_payload)
             lesson_title = response_payload["new_attempts"][0]["lesson_title"]
             message = f'У вас проверили работу "{lesson_title}"'
@@ -39,7 +42,7 @@ def main():
         except (ReadTimeout, KeyError):
             continue
         except ConnectionError as e:
-            print(e)
+            logging.error(e)
             half_an_hour = 3600
             time.sleep(half_an_hour)
             continue
