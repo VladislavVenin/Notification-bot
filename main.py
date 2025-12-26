@@ -8,14 +8,34 @@ import requests
 from requests.exceptions import ReadTimeout, ConnectionError
 
 
+class TelegramHandler(logging.Handler):
+    def __init__(self, bot, chat_id):
+        super().__init__()
+        self.bot = bot
+        self.chat_id = chat_id
+
+    def emit(self, record):
+        log_entry = self.format(record)
+        self.bot.send_message(self.chat_id, log_entry)
+
+
 def main():
+    bot_api_key = decouple.config('TG_BOT')
+    bot = telegram.Bot(token=bot_api_key)
+    chat_id = decouple.config('CHAT_ID')
+
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+
     logging.basicConfig(
-        level=logging.INFO,
         format="%(asctime)s (%(process)d) %(levelname)s: %(message)s",
         datefmt='%d/%m/%Y %I:%M:%S'
     )
-    bot_api_key = decouple.config('TG_BOT')
-    bot = telegram.Bot(token=bot_api_key)
+    tg_formatter = logging.Formatter("%(levelname)s: %(message)s")
+
+    tg_handler = TelegramHandler(bot, chat_id)
+    tg_handler.setFormatter(tg_formatter)
+    logger.addHandler(tg_handler)
 
     devman_token = decouple.config('DEVMAN_TOKEN')
     headers = {
@@ -38,7 +58,7 @@ def main():
                 message += "\n\nК сожалению в работе нашлись ошибки."
             else:
                 message += "\n\nПреподавателю всё понравилось, можно приступать к следующему уроку!"
-            bot.send_message(decouple.config('CHAT_ID'), message)
+            bot.send_message(chat_id, message)
             payload["timestamp"] = response_payload["new_attempts"][0]["timestamp"]
         except (ReadTimeout, KeyError):
             continue
