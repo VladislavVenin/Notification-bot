@@ -63,8 +63,9 @@ def main():
         except ReadTimeout:
             continue
         except KeyError as e:
-            logging.error(response_payload)
-            logging.error(e)
+            if response_payload["status"] != "timeout":
+                logging.error(response_payload)
+                logging.error(e)
             time.sleep(60)
             continue
         except ConnectionError as e:
