@@ -60,7 +60,12 @@ def main():
                 message += "\n\nПреподавателю всё понравилось, можно приступать к следующему уроку!"
             bot.send_message(chat_id, message)
             payload["timestamp"] = response_payload["new_attempts"][0]["timestamp"]
-        except (ReadTimeout, KeyError):
+        except ReadTimeout:
+            continue
+        except KeyError as e:
+            logging.error(response_payload)
+            logging.error(e)
+            time.sleep(60)
             continue
         except ConnectionError as e:
             logging.error(e)
